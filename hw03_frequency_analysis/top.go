@@ -11,35 +11,29 @@ type Word struct {
 }
 
 func Top10(text string) []string {
-	wordCounted := []Word{}
-
 	if len(text) == 0 {
 		return nil
 	}
 
 	textFields := strings.Fields(text)
-
+	wordsCounted := make(map[string]int, len(textFields))
 	for _, name := range textFields {
-		found := false
-		for i := 0; i < len(wordCounted); i++ {
-			if wordCounted[i].name == name {
-				wordCounted[i].count++
-				found = true
-				break
-			}
-		}
-		if !found {
-			wordCounted = append(wordCounted, Word{name, 1})
-		}
+		wordsCounted[name]++
 	}
-	sort.Slice(wordCounted, func(i, j int) bool {
-		return wordCounted[i].count > wordCounted[j].count ||
-			(wordCounted[i].count == wordCounted[j].count &&
-				strings.Compare(wordCounted[i].name, wordCounted[j].name) == -1)
+
+	words := make([]Word, 0, len(wordsCounted))
+	for name, count := range wordsCounted {
+		words = append(words, Word{name, count})
+	}
+
+	sort.Slice(words, func(i, j int) bool {
+		return words[i].count > words[j].count ||
+			(words[i].count == words[j].count &&
+				strings.Compare(words[i].name, words[j].name) == -1)
 	})
 
 	result := make([]string, 0)
-	for _, item := range wordCounted {
+	for _, item := range words {
 		result = append(result, item.name)
 	}
 	if len(result) < 10 {
