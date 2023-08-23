@@ -16,7 +16,7 @@ func Top10(text string) []string {
 	}
 
 	textFields := strings.Fields(text)
-	wordsCounted := make(map[string]int, len(textFields))
+	wordsCounted := make(map[string]int)
 	for _, name := range textFields {
 		wordsCounted[name]++
 	}
@@ -29,15 +29,17 @@ func Top10(text string) []string {
 	sort.Slice(words, func(i, j int) bool {
 		return words[i].count > words[j].count ||
 			(words[i].count == words[j].count &&
-				strings.Compare(words[i].name, words[j].name) == -1)
+				words[i].name < words[j].name)
 	})
 
 	result := make([]string, 0)
-	for _, item := range words {
-		result = append(result, item.name)
+	maxResult := 10
+	for index, item := range words {
+		if maxResult > index {
+			result = append(result, item.name)
+		} else {
+			break
+		}
 	}
-	if len(result) < 10 {
-		return result
-	}
-	return result[:10]
+	return result
 }
