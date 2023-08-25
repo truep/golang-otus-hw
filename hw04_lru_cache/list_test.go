@@ -75,6 +75,5 @@ func TestList(t *testing.T) {
 			elems = append(elems, i.Value.(int))
 		}
 		require.Equal(t, []int{30, 80, 70, 60, 40, 10, 50}, elems)
-
 	})
 }
