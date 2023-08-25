@@ -21,6 +21,10 @@ type list struct {
 	len  int
 }
 
+func NewList() List {
+	return new(list)
+}
+
 func (l list) Len() int { return l.len }
 
 func (l list) Front() *ListItem {
@@ -106,8 +110,4 @@ func (l *list) MoveToFront(i *ListItem) {
 	i.Next = l.Front()
 	l.Front().Prev = i
 	l.base.Prev = i
-}
-
-func NewList() List {
-	return new(list)
 }
