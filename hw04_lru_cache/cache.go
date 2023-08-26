@@ -81,9 +81,6 @@ func (lc *lruCache) Clear() {
 	lc.m.Lock()
 	defer lc.m.Unlock()
 
-	for lc.queue.Len() > 0 {
-		f := lc.queue.Front()
-		delete(lc.items, f.Value.(*cacheItem).key)
-		lc.queue.Remove(f)
-	}
+	lc.queue = NewList()
+	lc.items = make(map[Key]*ListItem, lc.capacity)
 }

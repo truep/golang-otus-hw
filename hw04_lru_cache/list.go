@@ -44,16 +44,13 @@ func (l list) Back() *ListItem {
 func (l *list) PushFront(v interface{}) *ListItem {
 	li := &ListItem{
 		Value: v,
-		Next:  l.Front(),
 	}
-
-	switch l.len {
-	case 0:
-		l.base.Prev = li
-		l.base.Next = li
+	switch l.Front() == nil {
+	case true:
+		l.base.Prev, l.base.Next = li, li
 	default:
-		li.Next = l.Front()
 		l.Front().Prev = li
+		li.Next = l.Front()
 		l.base.Prev = li
 	}
 	l.len++
@@ -64,14 +61,12 @@ func (l *list) PushBack(v interface{}) *ListItem {
 	li := &ListItem{
 		Value: v,
 	}
-
-	switch l.len {
-	case 0:
-		l.base.Next = li
-		l.base.Prev = li
+	switch l.Back() == nil {
+	case true:
+		l.base.Prev, l.base.Next = li, li
 	default:
-		li.Prev = l.Back()
 		l.Back().Next = li
+		li.Prev = l.Back()
 		l.base.Next = li
 	}
 	l.len++
@@ -79,15 +74,18 @@ func (l *list) PushBack(v interface{}) *ListItem {
 }
 
 func (l *list) Remove(i *ListItem) {
-	if i != l.Front() {
-		i.Prev.Next = i.Next
-	} else {
+	switch {
+	case l.Front() == l.Back():
+		l.base.Next, l.base.Prev = nil, nil
+	case i == l.Front():
+		i.Next.Prev = nil
 		l.base.Prev = i.Next
-	}
-	if i != l.Back() {
-		i.Next.Prev = i.Prev
-	} else {
+	case i == l.Back():
+		i.Prev.Next = nil
 		l.base.Next = i.Prev
+	default:
+		i.Next.Prev = i.Prev
+		i.Prev.Next = i.Next
 	}
 	i.Next = nil
 	i.Prev = nil
@@ -96,15 +94,15 @@ func (l *list) Remove(i *ListItem) {
 }
 
 func (l *list) MoveToFront(i *ListItem) {
-	if i == l.Front() {
+	switch {
+	case i == l.Front():
 		return
-	}
-
-	i.Prev.Next = i.Next
-	if i != l.Back() {
-		i.Next.Prev = i.Prev
-	} else {
+	case i == l.Back():
+		i.Prev.Next = nil
 		l.base.Next = i.Prev
+	default:
+		i.Prev.Next = i.Next
+		i.Next.Prev = i.Prev
 	}
 	i.Prev = nil
 	i.Next = l.Front()

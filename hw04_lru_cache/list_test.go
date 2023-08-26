@@ -15,6 +15,64 @@ func TestList(t *testing.T) {
 		require.Nil(t, l.Back())
 	})
 
+	t.Run("first element to front", func(t *testing.T) {
+		l := NewList()
+		require.Equal(t, 0, l.Len())
+
+		li := l.PushFront(11)
+		require.Equal(t, l.Front(), li)
+		require.Equal(t, l.Back(), li)
+
+		require.Nil(t, li.Prev)
+		require.Nil(t, li.Next)
+	})
+
+	t.Run("first element to back", func(t *testing.T) {
+		l := NewList()
+		require.Equal(t, 0, l.Len())
+
+		li := l.PushBack(11)
+		require.Equal(t, l.Front(), li)
+		require.Equal(t, l.Back(), li)
+
+		require.Nil(t, li.Prev)
+		require.Nil(t, li.Next)
+	})
+
+	t.Run("more then one element in list", func(t *testing.T) {
+		l := NewList()
+		require.Equal(t, 0, l.Len())
+
+		liFirst := l.PushFront(11)
+		liSecond := l.PushFront(22)
+
+		require.Nil(t, liFirst.Next)
+		require.Nil(t, liSecond.Prev)
+
+		require.Equal(t, liFirst.Prev, liSecond)
+		require.Equal(t, liSecond.Next, liFirst)
+
+		require.Equal(t, l.Front(), liSecond)
+		require.Equal(t, l.Back(), liFirst)
+
+		liThird := l.PushBack(33)
+		require.Nil(t, liSecond.Prev)
+		require.Nil(t, liThird.Next)
+
+		require.Equal(t, liFirst.Prev, liSecond)
+		require.Equal(t, liFirst.Next, liThird)
+
+		require.Equal(t, liSecond.Next, liFirst)
+		require.Equal(t, liThird.Prev, liFirst)
+
+		require.Equal(t, l.Front(), liSecond)
+		require.Equal(t, l.Back(), liThird)
+
+		require.Equal(t, 11, liFirst.Value)
+		require.Equal(t, 22, liSecond.Value)
+		require.Equal(t, 33, liThird.Value)
+	})
+
 	t.Run("complex", func(t *testing.T) {
 		l := NewList()
 
@@ -40,6 +98,13 @@ func TestList(t *testing.T) {
 		require.Equal(t, 2, l.Len())
 		require.Equal(t, 10, l.Front().Value)
 		require.Equal(t, 30, l.Back().Value)
+
+		l.Remove(l.Back()) // [10]
+		require.Equal(t, 1, l.Len())
+		require.Equal(t, 10, l.Back().Value)
+
+		l.PushBack(30)
+		require.Equal(t, 2, l.Len())
 
 		for i, v := range [...]int{40, 50, 60, 70, 80} {
 			if i%2 == 0 {
@@ -75,5 +140,38 @@ func TestList(t *testing.T) {
 			elems = append(elems, i.Value.(int))
 		}
 		require.Equal(t, []int{30, 80, 70, 60, 40, 10, 50}, elems)
+	})
+
+	t.Run("two lists", func(t *testing.T) {
+		l1 := NewList()
+		l2 := NewList()
+
+		for i, v := range [...]int{40, 50, 60, 70, 80} {
+			if i%2 == 0 {
+				l1.PushFront(v)
+				l2.PushBack(v)
+			} else {
+				l1.PushBack(v)
+				l2.PushFront(v)
+			}
+		}
+		// l1: [80, 60, 40, 50, 70]
+		// l2: [70, 50, 40, 60, 80]
+
+		require.NotEqual(t, l1, l2)
+
+		require.Equal(t, 80, l1.Front().Value)
+		require.Equal(t, 70, l1.Back().Value)
+		require.Equal(t, 70, l2.Front().Value)
+		require.Equal(t, 80, l2.Back().Value)
+
+		l1.Remove(l1.Back().Prev) // remove 50
+		require.Equal(t, 4, l1.Len())
+		require.Equal(t, 5, l2.Len())
+
+		require.Equal(t, 40, l1.Back().Prev.Value)
+		l2.MoveToFront(l2.Front().Next) // move 50
+		require.Equal(t, 50, l2.Front().Value)
+		require.Equal(t, 80, l1.Front().Value)
 	})
 }
