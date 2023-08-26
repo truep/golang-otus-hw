@@ -17,7 +17,8 @@ type ListItem struct {
 }
 
 type list struct {
-	base ListItem
+	head *ListItem
+	tail *ListItem
 	len  int
 }
 
@@ -31,14 +32,14 @@ func (l list) Front() *ListItem {
 	if l.len == 0 {
 		return nil
 	}
-	return l.base.Prev
+	return l.head
 }
 
 func (l list) Back() *ListItem {
 	if l.len == 0 {
 		return nil
 	}
-	return l.base.Next
+	return l.tail
 }
 
 func (l *list) PushFront(v interface{}) *ListItem {
@@ -47,11 +48,11 @@ func (l *list) PushFront(v interface{}) *ListItem {
 	}
 	switch l.Front() == nil {
 	case true:
-		l.base.Prev, l.base.Next = li, li
+		l.head, l.tail = li, li
 	default:
 		l.Front().Prev = li
 		li.Next = l.Front()
-		l.base.Prev = li
+		l.head = li
 	}
 	l.len++
 	return li
@@ -63,11 +64,11 @@ func (l *list) PushBack(v interface{}) *ListItem {
 	}
 	switch l.Back() == nil {
 	case true:
-		l.base.Prev, l.base.Next = li, li
+		l.head, l.tail = li, li
 	default:
 		l.Back().Next = li
 		li.Prev = l.Back()
-		l.base.Next = li
+		l.tail = li
 	}
 	l.len++
 	return li
@@ -76,13 +77,13 @@ func (l *list) PushBack(v interface{}) *ListItem {
 func (l *list) Remove(i *ListItem) {
 	switch {
 	case l.Front() == l.Back():
-		l.base.Next, l.base.Prev = nil, nil
+		l.tail, l.head = nil, nil
 	case i == l.Front():
 		i.Next.Prev = nil
-		l.base.Prev = i.Next
+		l.head = i.Next
 	case i == l.Back():
 		i.Prev.Next = nil
-		l.base.Next = i.Prev
+		l.tail = i.Prev
 	default:
 		i.Next.Prev = i.Prev
 		i.Prev.Next = i.Next
@@ -99,7 +100,7 @@ func (l *list) MoveToFront(i *ListItem) {
 		return
 	case i == l.Back():
 		i.Prev.Next = nil
-		l.base.Next = i.Prev
+		l.tail = i.Prev
 	default:
 		i.Prev.Next = i.Next
 		i.Next.Prev = i.Prev
@@ -107,5 +108,5 @@ func (l *list) MoveToFront(i *ListItem) {
 	i.Prev = nil
 	i.Next = l.Front()
 	l.Front().Prev = i
-	l.base.Prev = i
+	l.head = i
 }
