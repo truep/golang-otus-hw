@@ -29,16 +29,10 @@ func NewList() List {
 func (l list) Len() int { return l.len }
 
 func (l list) Front() *ListItem {
-	if l.len == 0 {
-		return nil
-	}
 	return l.head
 }
 
 func (l list) Back() *ListItem {
-	if l.len == 0 {
-		return nil
-	}
 	return l.tail
 }
 
