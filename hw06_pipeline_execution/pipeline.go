@@ -21,13 +21,18 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 
 func worker(in In, done In, ch Bi) {
 	defer close(ch)
+
 	for {
 		select {
 		case v, ok := <-in:
 			if !ok {
 				return
 			}
-			ch <- v
+			select {
+			case ch <- v:
+			case <-done:
+				return
+			}
 		case <-done:
 			return
 		}
