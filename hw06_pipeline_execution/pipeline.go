@@ -20,7 +20,12 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 }
 
 func worker(in In, done In, ch Bi) {
-	defer close(ch)
+	defer func() {
+		close(ch)
+		//nolint
+		for range in {
+		}
+	}()
 
 	for {
 		select {
