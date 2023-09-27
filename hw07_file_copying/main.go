@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"log"
 )
 
 var (
@@ -17,6 +18,9 @@ func init() {
 }
 
 func main() {
+	log.SetFlags(log.Ldate | log.Lmicroseconds | log.Llongfile)
 	flag.Parse()
-	// Place your code here.
+	if err := Copy(from, to, offset, limit); err != nil {
+		log.Fatalln(err)
+	}
 }
