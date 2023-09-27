@@ -22,9 +22,7 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 func worker(in In, done In, ch Bi) {
 	defer func() {
 		close(ch)
-		//nolint
-		for range in {
-		}
+		<-in
 	}()
 
 	for {
