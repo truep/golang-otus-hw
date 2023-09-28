@@ -42,7 +42,12 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	if err != nil {
 		return err
 	}
-	defer dstFile.Close()
+	defer func() {
+		dstFile.Close()
+		if err != nil {
+			os.Remove(toPath)
+		}
+	}()
 
 	if limit == 0 {
 		limit = fstat.Size()
