@@ -9,6 +9,15 @@ import (
 
 type Environment map[string]EnvValue
 
+func (env Environment) UdpateEnv() {
+	for key, value := range env {
+		os.Unsetenv(key)
+		if !value.NeedRemove {
+			os.Setenv(key, value.Value)
+		}
+	}
+}
+
 type EnvValue struct {
 	Value      string
 	NeedRemove bool
@@ -31,7 +40,7 @@ func ReadDir(dir string) (Environment, error) {
 			continue
 		}
 
-		if !strings.Contains(file.Name(), "=") || !file.IsDir() {
+		if !strings.Contains(file.Name(), "=") && !file.IsDir() {
 			if fi.Size() == 0 {
 				ev[file.Name()] = EnvValue{
 					Value:      "",
