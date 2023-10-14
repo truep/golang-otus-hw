@@ -54,7 +54,6 @@ func TestReadDir(t *testing.T) {
 	})
 
 	t.Run("dir instead file", func(t *testing.T) {
-
 	})
 	t.Run("test all", func(t *testing.T) {
 		err := os.Symlink("./NOTEXISTS", dir+"/ERRFILE")
