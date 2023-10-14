@@ -23,7 +23,7 @@ func TestRunCmd(t *testing.T) {
 
 	t.Run("fail args", func(t *testing.T) {
 		env := make(Environment)
-		cmd := []string{"ls", "not_exists_args"}
+		cmd := []string{"ls", "-e"}
 		returnCode := RunCmd(cmd, env)
 		assert.NotEqual(t, 0, returnCode, "Expected non-zero return code")
 	})

@@ -47,14 +47,48 @@ func TestReadDir(t *testing.T) {
 		defer os.Remove(dir)
 
 		env, err := ReadDir(dir)
-		t.Log(err)
 
 		assert.Nil(t, env, "Expected env to be nil")
 		assert.Nil(t, err, "Expected err to be nil")
 	})
 
-	t.Run("dir instead file", func(t *testing.T) {
+	t.Run("file only with removable fields", func(t *testing.T) {
+		dir := "./empty"
+		err := os.Mkdir("./empty", os.ModePerm)
+		assert.NoError(t, err)
+		defer os.Remove(dir)
+
+		filePath := "./empty/NOTNULL"
+		fileContent := "  \t  \t"
+		file, err := os.Create(filePath)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer os.Remove(filePath)
+		defer file.Close()
+
+		_, err = file.WriteString(fileContent)
+		if err != nil {
+			t.Fatal(err)
+		}
+		env, err := ReadDir(dir)
+		assert.NotNil(t, env)
+		assert.Len(t, env, 1)
+		assert.Nil(t, err, "Expected err to be nil")
+		expect := Environment{
+			"NOTNULL": EnvValue{
+				Value:      "",
+				NeedRemove: false,
+			},
+		}
+		assert.Equal(t, expect, env, "Expected env to be equal to expect")
+
+		os.Setenv("NOTNULL", "MUST BE EMPTY")
+		env.UdpateEnv()
+
+		assert.Equal(t, "", os.Getenv("NOTNULL"), "Expected os Env variable NOTNULL=")
 	})
+
 	t.Run("test all", func(t *testing.T) {
 		err := os.Symlink("./NOTEXISTS", dir+"/ERRFILE")
 		assert.NoError(t, err)
