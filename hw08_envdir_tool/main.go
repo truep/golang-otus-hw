@@ -1,5 +1,22 @@
 package main
 
+import (
+	"fmt"
+	"os"
+)
+
 func main() {
-	// Place your code here.
+	if len(os.Args) < 3 {
+		fmt.Printf("There is not enough arguments.\nUsage: %s <env_directory> <command> [arg1]...[argN]\n", os.Args[0])
+		return
+	}
+
+	envVars, err := ReadDir(os.Args[1])
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	errCode := RunCmd(os.Args[2:], envVars)
+	os.Exit(errCode)
 }
