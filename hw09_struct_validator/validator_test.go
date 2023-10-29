@@ -93,7 +93,7 @@ func TestValidateOk(t *testing.T) {
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("case %d %s", i, tt.description), func(t *testing.T) {
 			tt := tt
-			// t.Parallel()
+			t.Parallel()
 			err := Validate(tt.in)
 			require.Nil(t, err)
 		})
@@ -186,7 +186,7 @@ func TestValidateError(t *testing.T) {
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("case %d %s", i, tt.description), func(t *testing.T) {
 			tt := tt
-			// t.Parallel()
+			t.Parallel()
 			err := Validate(tt.in)
 			require.EqualError(t, err, tt.expectedErr.Error())
 		})
@@ -308,7 +308,7 @@ func TestNonValidateError(t *testing.T) {
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("case %d %s", i, tt.description), func(t *testing.T) {
 			tt := tt
-			// t.Parallel()
+			t.Parallel()
 			err := Validate(tt.in)
 			require.ErrorIs(t, err, tt.expectedErr)
 		})
