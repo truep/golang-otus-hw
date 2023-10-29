@@ -154,7 +154,7 @@ func validate(rule, fieldName string, value reflect.Value) error {
 		case "in":
 			return validateIn(ruleValue, fieldName, value)
 		default:
-			return errors.Join(ErrInvalidRule, fmt.Errorf("%s, not valid for string type", ruleName))
+			return ErrInvalidRule
 		}
 	case value.Kind() == reflect.Int:
 		switch ruleName {
@@ -165,7 +165,7 @@ func validate(rule, fieldName string, value reflect.Value) error {
 		case "max":
 			return validateMax(ruleValue, fieldName, value)
 		default:
-			return errors.Join(ErrInvalidRule, fmt.Errorf("%s, not valid for int type", ruleName))
+			return ErrInvalidRule
 		}
 	default:
 		return ErrUnsupportedField
@@ -175,7 +175,7 @@ func validate(rule, fieldName string, value reflect.Value) error {
 func validateLen(ruleValue, fieldName string, value reflect.Value) error {
 	length, err := strconv.Atoi(ruleValue)
 	if err != nil {
-		return errors.Join(ErrInvalidRuleValue, err)
+		return ErrInvalidRuleValue
 	}
 	if value.Len() != length {
 		return ValidationError{fieldName, ErrValidateLen}
@@ -187,7 +187,7 @@ func validateLen(ruleValue, fieldName string, value reflect.Value) error {
 func validateRegexp(ruleValue, fieldName string, value reflect.Value) error {
 	matched, err := regexp.MatchString(ruleValue, value.String())
 	if err != nil {
-		return errors.Join(ErrInvalidRuleValue, err)
+		return ErrInvalidRuleValue
 	}
 	if !matched {
 		return ValidationError{fieldName, ErrValidateRegexp}
@@ -215,7 +215,7 @@ func validateIn(ruleValue, fieldName string, value reflect.Value) error {
 func validateMin(ruleValue, fieldName string, value reflect.Value) error {
 	minVal, err := strconv.Atoi(ruleValue)
 	if err != nil {
-		return errors.Join(ErrInvalidRuleValue, err)
+		return ErrInvalidRuleValue
 	}
 	if int(value.Int()) < minVal {
 		return ValidationError{fieldName, ErrValidateMin}
@@ -227,7 +227,7 @@ func validateMin(ruleValue, fieldName string, value reflect.Value) error {
 func validateMax(ruleValue, fieldName string, value reflect.Value) error {
 	maxVal, err := strconv.Atoi(ruleValue)
 	if err != nil {
-		return errors.Join(ErrInvalidRuleValue, err)
+		return ErrInvalidRuleValue
 	}
 	if int(value.Int()) > maxVal {
 		return ValidationError{fieldName, ErrValidateMax}
