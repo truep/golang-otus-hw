@@ -1,9 +1,11 @@
+//go:build !bench
 // +build !bench
 
 package hw10programoptimization
 
 import (
 	"bytes"
+	"regexp/syntax"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -16,6 +18,7 @@ func TestGetDomainStat(t *testing.T) {
 {"Id":4,"Name":"Gregory Reid","Username":"tButler","Email":"5Moore@Teklist.net","Phone":"520-04-16","Password":"r639qLNu","Address":"Sunfield Park 20"}
 {"Id":5,"Name":"Janice Rose","Username":"KeithHart","Email":"nulla@Linktype.com","Phone":"146-91-01","Password":"acSBF5","Address":"Russell Trail 61"}`
 
+	dataFailed := `{"Id":1,"Name":"Howard Mendoza","Username":"0Oliver","Email":"aliquid_qui_ea@Browsedrive.gov""Phone":"6-866-899-36-79","Password":"InAQJvsq","Address":"Blackbird Place 25"}`
 	t.Run("find 'com'", func(t *testing.T) {
 		result, err := GetDomainStat(bytes.NewBufferString(data), "com")
 		require.NoError(t, err)
@@ -35,5 +38,18 @@ func TestGetDomainStat(t *testing.T) {
 		result, err := GetDomainStat(bytes.NewBufferString(data), "unknown")
 		require.NoError(t, err)
 		require.Equal(t, DomainStat{}, result)
+	})
+
+	t.Run("regexp compile error", func(t *testing.T) {
+		var se *syntax.Error
+		result, err := GetDomainStat(bytes.NewBufferString(data), "(\\.\\..\\.\\)")
+		require.Len(t, result, 0, "DomainStat map[string]int length should be 0")
+		require.ErrorAs(t, err, &se)
+	})
+
+	t.Run("failed data", func(t *testing.T) {
+		result, err := GetDomainStat(bytes.NewBufferString(dataFailed), "ru")
+		require.Len(t, result, 0, "DomainStat map[string]int length should be 0")
+		require.ErrorContains(t, err, "get users error")
 	})
 }
