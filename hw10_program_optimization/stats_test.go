@@ -57,4 +57,10 @@ func TestGetDomainStat(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, DomainStat{}, result)
 	})
+
+	t.Run("invalid email address", func(t *testing.T) {
+		result, err := GetDomainStat(bytes.NewBufferString(`{"Email":"user$example.com"}`), "com")
+		require.NoError(t, err)
+		require.Equal(t, DomainStat{}, result)
+	})
 }
