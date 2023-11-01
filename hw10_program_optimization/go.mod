@@ -3,8 +3,8 @@ module github.com/truep/golan-otus-hw/hw10_program_optimization
 go 1.19
 
 require (
-	github.com/goccy/go-json v0.10.2
 	github.com/stretchr/testify v1.8.4
+	github.com/valyala/fastjson v1.6.4
 )
 
 require (

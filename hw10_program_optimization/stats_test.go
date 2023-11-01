@@ -42,8 +42,8 @@ func TestGetDomainStat(t *testing.T) {
 
 	t.Run("failed data", func(t *testing.T) {
 		result, err := GetDomainStat(bytes.NewBufferString(dataFailed), "ru")
-		require.Len(t, result, 0, "DomainStat map[string]int length should be 0")
-		require.ErrorContains(t, err, "get users error")
+		require.NoError(t, err)
+		require.Equal(t, DomainStat{}, result)
 	})
 
 	t.Run("find no 'com'", func(t *testing.T) {

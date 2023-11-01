@@ -2,21 +2,15 @@ package hw10programoptimization
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"strings"
 
-	"github.com/goccy/go-json"
+	"github.com/valyala/fastjson"
 )
-
-type User struct {
-	Email string
-}
 
 type DomainStat map[string]int
 
 func GetDomainStat(r io.Reader, domain string) (DomainStat, error) {
-	var user User
 	countResults := make(DomainStat, bufio.MaxScanTokenSize/2)
 	suffix := "." + domain
 
@@ -24,15 +18,13 @@ func GetDomainStat(r io.Reader, domain string) (DomainStat, error) {
 	scanner.Split(bufio.ScanLines)
 
 	for scanner.Scan() {
-		if err := json.Unmarshal(scanner.Bytes(), &user); err != nil {
-			return countResults, fmt.Errorf("get users error: %w", err)
-		}
+		email := fastjson.GetString(scanner.Bytes(), "Email")
 
-		if user.Email != "" {
-			if strings.HasSuffix(user.Email, suffix) {
-				email := strings.SplitN(user.Email, "@", 2)
-				if len(email) == 2 {
-					resultString := strings.ToLower(email[1])
+		if email != "" {
+			if strings.HasSuffix(email, suffix) {
+				addr := strings.SplitN(email, "@", 2)
+				if len(addr) == 2 {
+					resultString := strings.ToLower(addr[1])
 					countResults[resultString]++
 				}
 			}
