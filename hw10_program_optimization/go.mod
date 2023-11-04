@@ -1,4 +1,4 @@
-module github.com/truep/golan-otus-hw/hw10_program_optimization
+module github.com/truep/golang-otus-hw/hw10_program_optimization
 
 go 1.19
 
