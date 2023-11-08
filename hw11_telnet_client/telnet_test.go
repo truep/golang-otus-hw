@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -62,4 +63,25 @@ func TestTelnetClient(t *testing.T) {
 
 		wg.Wait()
 	})
+}
+
+func TestSendNoConnection(t *testing.T) {
+	client := NewTelnetClient("127.0.0.1:1234", time.Second*5, nil, nil)
+	err := client.Send()
+	assert.Error(t, err)
+	assert.Equal(t, ErrConnectionEstablished, err)
+}
+
+func TestReceiveNoConnection(t *testing.T) {
+	client := NewTelnetClient("127.0.0.1:1234", time.Second*5, nil, nil)
+	err := client.Receive()
+	assert.Error(t, err)
+	assert.Equal(t, ErrConnectionEstablished, err)
+}
+
+func TestCloseNoConnection(t *testing.T) {
+	in := &bytes.Buffer{}
+	client := NewTelnetClient("127.0.0.1:1234", time.Second*5, io.NopCloser(in), nil)
+	err := client.Close()
+	assert.NoError(t, err)
 }

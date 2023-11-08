@@ -9,7 +9,7 @@ import (
 
 const network = "tcp"
 
-var ErrConnactionEstablished = errors.New("there is no established coonection for client")
+var ErrConnectionEstablished = errors.New("there is no established coonection for client")
 
 type TelnetClient interface {
 	Connect() error
@@ -19,8 +19,8 @@ type TelnetClient interface {
 }
 
 type Telnet struct {
-	conn    net.Conn
 	address string
+	conn    net.Conn
 	timeout time.Duration
 	in      io.ReadCloser
 	out     io.Writer
@@ -33,8 +33,10 @@ func (t *Telnet) Connect() error {
 }
 
 func (t *Telnet) Close() error {
-	if err := t.conn.Close(); err != nil {
-		return err
+	if t.conn != nil {
+		if err := t.conn.Close(); err != nil {
+			return err
+		}
 	}
 
 	if err := t.in.Close(); err != nil {
@@ -45,8 +47,9 @@ func (t *Telnet) Close() error {
 
 func (t *Telnet) Send() error {
 	if t.conn == nil {
-		return ErrConnactionEstablished
+		return ErrConnectionEstablished
 	}
+
 	_, err := io.Copy(t.conn, t.in)
 	if err != nil {
 		return err
@@ -56,7 +59,7 @@ func (t *Telnet) Send() error {
 
 func (t *Telnet) Receive() error {
 	if t.conn == nil {
-		return ErrConnactionEstablished
+		return ErrConnectionEstablished
 	}
 
 	_, err := io.Copy(t.out, t.conn)
@@ -68,10 +71,10 @@ func (t *Telnet) Receive() error {
 
 func NewTelnetClient(address string, timeout time.Duration, in io.ReadCloser, out io.Writer) TelnetClient {
 	return &Telnet{
-		nil,
-		address,
-		timeout,
-		in,
-		out,
+		address: address,
+		conn:    nil,
+		timeout: timeout,
+		in:      in,
+		out:     out,
 	}
 }

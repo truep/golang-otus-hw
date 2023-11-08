@@ -44,7 +44,6 @@ func main() {
 		flag.Usage()
 		log.Fatalln("Not valid arguments")
 	}
-
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
@@ -65,10 +64,10 @@ func main() {
 			return
 		default:
 			if err := tc.Send(); err != nil {
-				log.Println(err)
-				cancel()
-				return
+				log.Fatalln(err)
 			}
+			cancel()
+			return
 		}
 	}()
 
@@ -78,10 +77,10 @@ func main() {
 			return
 		default:
 			if err := tc.Receive(); err != nil {
-				log.Println(err)
-				cancel()
-				return
+				log.Fatalln(err)
 			}
+			cancel()
+			return
 		}
 	}()
 
