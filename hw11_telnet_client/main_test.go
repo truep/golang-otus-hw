@@ -36,6 +36,12 @@ func TestCheckArgs_InvalidPort(t *testing.T) {
 	assert.False(t, result, "Expected checkArgs to return false for invalid port")
 }
 
+func TestCheckArgs_InvalidPort2(t *testing.T) {
+	host, port := "exemple.com", "80808080"
+	result := checkArgs(host, port)
+	assert.False(t, result, "Expected checkArgs to return false for invalid port")
+}
+
 func TestCheckArgs_InvalidHost(t *testing.T) {
 	host, port := "unknownhost", "8080"
 	result := checkArgs(host, port)

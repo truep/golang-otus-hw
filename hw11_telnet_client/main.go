@@ -44,43 +44,31 @@ func main() {
 		flag.Usage()
 		log.Fatalln("Not valid arguments")
 	}
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer cancel()
 
 	tc := NewTelnetClient(net.JoinHostPort(host, port), timeout, os.Stdin, os.Stdout)
 	if err := tc.Connect(); err != nil {
-		cancel()
-		log.Println(err)
+		log.Fatalln(err)
 	}
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer cancel()
 	defer func() {
 		if err := tc.Close(); err != nil {
+			cancel()
 			log.Fatalln(err)
 		}
 	}()
 
 	go func() {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			if err := tc.Send(); err != nil {
-				log.Fatalln(err)
-			}
-			cancel()
-			return
+		defer cancel()
+		if err := tc.Send(); err != nil {
+			log.Fatalln(err)
 		}
 	}()
 
 	go func() {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			if err := tc.Receive(); err != nil {
-				log.Fatalln(err)
-			}
-			cancel()
-			return
+		defer cancel()
+		if err := tc.Receive(); err != nil {
+			log.Fatalln(err)
 		}
 	}()
 
@@ -91,7 +79,7 @@ func checkArgs(host, port string) bool {
 	if host == "" || port == "" {
 		return false
 	}
-	if _, err := strconv.Atoi(port); err != nil {
+	if portNum, err := strconv.ParseUint(port, 10, 32); err != nil || portNum > 65535 || portNum < 1 {
 		return false
 	}
 
